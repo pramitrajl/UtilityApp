@@ -28,6 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import au.edu.jcu.assessment.utilityapp.screen.SettingsScreen
+import au.edu.jcu.assessment.utilityapp.screen.UtilityScreen
 import au.edu.jcu.assessment.utilityapp.ui.theme.MobileTech_UtilityAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -81,33 +83,5 @@ fun UtilityApp() {
     }
 }
 
-@Composable
-fun UtilityScreen() {
-    var counter by remember { mutableIntStateOf(0) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text("Utility Screen", style = MaterialTheme.typography.headlineMedium)
-        Text("Counter: $counter", style = MaterialTheme.typography.bodyLarge)
 
-        Button(onClick = { counter++ }) {
-            Text("Increment")
-        }
-    }
-}
-
-@Composable
-fun SettingsScreen() {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(24.dp), Arrangement.spacedBy(16.dp)
-    ) {
-        Text("Settings Screen", style = MaterialTheme.typography.headlineMedium)
-        Text("This is where you can add toggles or preferences.")
-    }
-}
