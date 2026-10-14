@@ -15,14 +15,10 @@ import java.util.Locale
  */
 class CurrencyViewModel : ViewModel() {
 
-    // Internal mutable state flow (only ViewModel can edit)
     private val _uiState = MutableStateFlow(CurrencyUiState())
-
-    // Public read-only state flow (UI screens can read, but cannot modify directly)
     val uiState: StateFlow<CurrencyUiState> = _uiState.asStateFlow()
 
     init {
-        // Automatically fetch exchange rates when ViewModel is first created
         fetchExchangeRates()
     }
 
@@ -33,17 +29,14 @@ class CurrencyViewModel : ViewModel() {
         val base = _uiState.value.fromCurrency
 
         viewModelScope.launch {
-            // 1. Set loading to true
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                // 2. Call API on background thread
                 val response = RetrofitInstance.api.getExchangeRates(base)
 
-                // 3. Update rates in UI state
                 _uiState.update { state ->
                     val ratesMap = response.rates.toMutableMap()
-                    ratesMap[base] = 1.0 // Base currency conversion with itself is 1.0
+                    ratesMap[base] = 1.0
 
                     state.copy(
                         rates = ratesMap,
@@ -51,11 +44,9 @@ class CurrencyViewModel : ViewModel() {
                     )
                 }
 
-                // 4. Trigger conversion calculation
                 calculateConversion()
 
             } catch (e: Exception) {
-                // 4. Handle errors (e.g. no internet)
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -80,5 +71,46 @@ class CurrencyViewModel : ViewModel() {
         } else {
             _uiState.update { it.copy(convertedResult = "--") }
         }
+    }
+
+    // ==========================================
+    // USER INTERACTION FUNCTIONS
+    // ==========================================
+
+    /**
+     * Called when user types a new amount in the text field.
+     */
+    fun onAmountChanged(newAmount: String) {
+        _uiState.update { it.copy(amountInput = newAmount) }
+        calculateConversion()
+    }
+
+    /**
+     * Called when user selects a new source currency in the 'From' dropdown.
+     */
+    fun onFromCurrencyChanged(newFrom: String) {
+        _uiState.update { it.copy(fromCurrency = newFrom) }
+        fetchExchangeRates() // Re-fetch rates for the new base currency
+    }
+
+    /**
+     * Called when user selects a new target currency in the 'To' dropdown.
+     */
+    fun onToCurrencyChanged(newTo: String) {
+        _uiState.update { it.copy(toCurrency = newTo) }
+        calculateConversion()
+    }
+
+    /**
+     * Swaps 'From' and 'To' currencies when user taps the swap icon button.
+     */
+    fun swapCurrencies() {
+        _uiState.update {
+            it.copy(
+                fromCurrency = it.toCurrency,
+                toCurrency = it.fromCurrency
+            )
+        }
+        fetchExchangeRates()
     }
 }
