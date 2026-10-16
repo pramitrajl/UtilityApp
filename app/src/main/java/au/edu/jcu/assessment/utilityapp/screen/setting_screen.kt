@@ -40,15 +40,21 @@ fun SettingsScreen(
 
     val languages = listOf("English", "Spanish", "French", "German", "Japanese")
 
+    val themeOptions = listOf(
+        "System Default" to settingsViewModel.getString("system_default"),
+        "Light Mode" to settingsViewModel.getString("light_mode"),
+        "Dark Mode" to settingsViewModel.getString("dark_mode")
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Title Header
+        // Translated Title Header
         Text(
-            text = "Settings",
+            text = settingsViewModel.getString("settings"),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -73,21 +79,21 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "App Theme",
+                    text = settingsViewModel.getString("theme"),
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                listOf("System Default", "Light Mode", "Dark Mode").forEach { themeOption ->
+                themeOptions.forEach { (key, label) ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         RadioButton(
-                            selected = (settingsState.selectedTheme == themeOption),
-                            onClick = { settingsViewModel.setTheme(themeOption) }
+                            selected = (settingsState.selectedTheme == key),
+                            onClick = { settingsViewModel.setTheme(key) }
                         )
                         Text(
-                            text = themeOption,
+                            text = label,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -107,7 +113,7 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "App Language",
+                    text = settingsViewModel.getString("app_language"),
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -120,7 +126,7 @@ fun SettingsScreen(
                         value = settingsState.selectedLanguage,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Language") },
+                        label = { Text(settingsViewModel.getString("app_language")) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageMenuExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -157,11 +163,11 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "About Currency Converter",
+                    text = settingsViewModel.getString("about"),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "Version 1.0.0",
+                    text = settingsViewModel.getString("version"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -169,7 +175,7 @@ fun SettingsScreen(
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                 Text(
-                    text = "API Provider: Frankfurter Open API",
+                    text = settingsViewModel.getString("api_provider"),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(

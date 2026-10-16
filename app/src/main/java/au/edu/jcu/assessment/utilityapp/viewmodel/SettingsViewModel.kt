@@ -51,6 +51,7 @@ class SettingsViewModel : ViewModel() {
     fun getString(key: String): String {
         return when (_uiState.value.selectedLanguage) {
             "Spanish" -> when (key) {
+                "utility" -> "Utilidad"
                 "title" -> "Convertidor de Divisas"
                 "amount" -> "Monto"
                 "from" -> "De"
@@ -60,10 +61,16 @@ class SettingsViewModel : ViewModel() {
                 "theme" -> "Tema de la Aplicación"
                 "app_language" -> "Idioma de la Aplicación"
                 "about" -> "Acerca del Convertidor"
+                "system_default" -> "Predeterminado del Sistema"
+                "light_mode" -> "Modo Claro"
+                "dark_mode" -> "Modo Oscuro"
+                "version" -> "Versión 1.0.0"
+                "api_provider" -> "Proveedor API: Frankfurter API"
                 "fetching" -> "Obteniendo tipos de cambio en vivo..."
                 else -> key
             }
             "French" -> when (key) {
+                "utility" -> "Utilité"
                 "title" -> "Convertisseur de Devises"
                 "amount" -> "Montant"
                 "from" -> "De"
@@ -73,10 +80,16 @@ class SettingsViewModel : ViewModel() {
                 "theme" -> "Thème de l'application"
                 "app_language" -> "Langue de l'application"
                 "about" -> "À propos du Convertisseur"
+                "system_default" -> "Par défaut du système"
+                "light_mode" -> "Mode Clair"
+                "dark_mode" -> "Mode Sombre"
+                "version" -> "Version 1.0.0"
+                "api_provider" -> "Fournisseur API: Frankfurter API"
                 "fetching" -> "Obtention des taux en direct..."
                 else -> key
             }
             "German" -> when (key) {
+                "utility" -> "Rechner"
                 "title" -> "Währungsumrechner"
                 "amount" -> "Betrag"
                 "from" -> "Von"
@@ -86,10 +99,16 @@ class SettingsViewModel : ViewModel() {
                 "theme" -> "App-Design"
                 "app_language" -> "App-Sprache"
                 "about" -> "Über den Umrechner"
+                "system_default" -> "Systemstandard"
+                "light_mode" -> "Heller Modus"
+                "dark_mode" -> "Dunkler Modus"
+                "version" -> "Version 1.0.0"
+                "api_provider" -> "API-Anbieter: Frankfurter API"
                 "fetching" -> "Live-Wechselkurse werden abgerufen..."
                 else -> key
             }
             "Japanese" -> when (key) {
+                "utility" -> "換算"
                 "title" -> "通貨コンバーター"
                 "amount" -> "金額"
                 "from" -> "変換元"
@@ -99,10 +118,16 @@ class SettingsViewModel : ViewModel() {
                 "theme" -> "アプリのテーマ"
                 "app_language" -> "アプリの言語"
                 "about" -> "通貨コンバーターについて"
+                "system_default" -> "システムデフォルト"
+                "light_mode" -> "ライトモード"
+                "dark_mode" -> "ダークモード"
+                "version" -> "バージョン 1.0.0"
+                "api_provider" -> "APIプロバイダー: Frankfurter API"
                 "fetching" -> "リアルタイム為替レートを取得中..."
                 else -> key
             }
             else -> when (key) { // English default
+                "utility" -> "Utility"
                 "title" -> "Currency Converter"
                 "amount" -> "Amount"
                 "from" -> "From"
@@ -112,6 +137,11 @@ class SettingsViewModel : ViewModel() {
                 "theme" -> "App Theme"
                 "app_language" -> "App Language"
                 "about" -> "About Currency Converter"
+                "system_default" -> "System Default"
+                "light_mode" -> "Light Mode"
+                "dark_mode" -> "Dark Mode"
+                "version" -> "Version 1.0.0"
+                "api_provider" -> "API Provider: Frankfurter Open API"
                 "fetching" -> "Fetching live exchange rates..."
                 else -> key
             }

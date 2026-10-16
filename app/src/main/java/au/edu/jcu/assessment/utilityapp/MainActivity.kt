@@ -60,13 +60,13 @@ fun UtilityApp(
             NavigationBar {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Utility") },
-                    label = { Text("Utility") },
+                    label = { Text(settingsViewModel.getString("utility")) },
                     selected = selectedTab == "Utility",
                     onClick = { selectedTab = "Utility" }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                    label = { Text("Settings") },
+                    label = { Text(settingsViewModel.getString("settings")) },
                     selected = selectedTab == "Settings",
                     onClick = { selectedTab = "Settings" }
                 )
