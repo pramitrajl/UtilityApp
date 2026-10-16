@@ -2,7 +2,7 @@
 
 An Android utility mobile application built with **Kotlin**, **Jetpack Compose**, **Material Design 3**, and **Retrofit 2**. This app delivers focused, "at-a-glance" live currency conversion for daily financial activities.
 
-Developed for **CP3406 / CP5307 Assessment 1: Utility App**.
+Developed for **CP3406 Assessment 1: Utility App By PRAMIT RAJ LUINTEL **.
 
 ---
 
