@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -91,6 +94,52 @@ fun UtilityScreen(
                 label = "To",
                 modifier = Modifier.weight(1f)
             )
+        }
+
+        // Conversion Result Display Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                when {
+                    // State 1: Show loading spinner while fetching rates
+                    uiState.isLoading -> {
+                        CircularProgressIndicator()
+                        Text("Fetching live exchange rates...")
+                    }
+
+                    // State 2: Show error message if API call fails
+                    uiState.errorMessage != null -> {
+                        Text(
+                            text = uiState.errorMessage ?: "Unknown error",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+
+                    // State 3: Display conversion result
+                    else -> {
+                        Text(
+                            text = "Converted Result",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        Text(
+                            text = uiState.convertedResult,
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
         }
     }
 }
