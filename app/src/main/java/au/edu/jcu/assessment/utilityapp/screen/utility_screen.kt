@@ -31,13 +31,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import au.edu.jcu.assessment.utilityapp.viewmodel.CurrencyViewModel
+import au.edu.jcu.assessment.utilityapp.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UtilityScreen(
-    viewModel: CurrencyViewModel = viewModel()
+    viewModel: CurrencyViewModel = viewModel(),
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val settingsState by settingsViewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -45,22 +48,22 @@ fun UtilityScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Title Header
+        // Translated Title Header
         Text(
-            text = "Currency Converter",
+            text = settingsViewModel.getString("title"),
             style = MaterialTheme.typography.headlineMedium
         )
 
-        // Amount Input Field
+        // Translated Amount Input Field
         OutlinedTextField(
             value = uiState.amountInput,
             onValueChange = { viewModel.onAmountChanged(it) },
-            label = { Text("Amount") },
+            label = { Text(settingsViewModel.getString("amount")) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Currency Selectors Row: [From Dropdown] -> [Swap Button] -> [To Dropdown]
+        // Currency Selectors Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -71,7 +74,7 @@ fun UtilityScreen(
                 selectedCurrency = uiState.fromCurrency,
                 currencies = uiState.availableCurrencies,
                 onCurrencySelected = { viewModel.onFromCurrencyChanged(it) },
-                label = "From",
+                label = settingsViewModel.getString("from"),
                 modifier = Modifier.weight(1f)
             )
 
@@ -91,7 +94,7 @@ fun UtilityScreen(
                 selectedCurrency = uiState.toCurrency,
                 currencies = uiState.availableCurrencies,
                 onCurrencySelected = { viewModel.onToCurrencyChanged(it) },
-                label = "To",
+                label = settingsViewModel.getString("to"),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -111,13 +114,11 @@ fun UtilityScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 when {
-                    // State 1: Show loading spinner while fetching rates
                     uiState.isLoading -> {
                         CircularProgressIndicator()
-                        Text("Fetching live exchange rates...")
+                        Text(settingsViewModel.getString("fetching"))
                     }
 
-                    // State 2: Show error message if API call fails
                     uiState.errorMessage != null -> {
                         Text(
                             text = uiState.errorMessage ?: "Unknown error",
@@ -126,10 +127,9 @@ fun UtilityScreen(
                         )
                     }
 
-                    // State 3: Display conversion result
                     else -> {
                         Text(
-                            text = "Converted Result",
+                            text = settingsViewModel.getString("result"),
                             style = MaterialTheme.typography.labelMedium
                         )
                         Text(
@@ -144,9 +144,6 @@ fun UtilityScreen(
     }
 }
 
-/**
- * Reusable Dropdown Menu Composable for selecting a currency code.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencyDropdown(

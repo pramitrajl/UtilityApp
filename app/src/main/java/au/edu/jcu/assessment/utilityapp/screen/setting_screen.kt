@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,12 +27,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import au.edu.jcu.assessment.utilityapp.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
-    var selectedTheme by remember { mutableStateOf("System Default") }
-    var selectedLanguage by remember { mutableStateOf("English") }
+fun SettingsScreen(
+    settingsViewModel: SettingsViewModel = viewModel()
+) {
+    val settingsState by settingsViewModel.uiState.collectAsState()
     var languageMenuExpanded by remember { mutableStateOf(false) }
 
     val languages = listOf("English", "Spanish", "French", "German", "Japanese")
@@ -47,6 +51,15 @@ fun SettingsScreen() {
             text = "Settings",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        // Status Feedback Message Banner
+        settingsState.statusMessage?.let { msg ->
+            Text(
+                text = msg,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
 
         // SECTION 1: Theme Preference Card
         Card(
@@ -64,17 +77,17 @@ fun SettingsScreen() {
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                listOf("System Default", "Light Mode", "Dark Mode").forEach { theme ->
+                listOf("System Default", "Light Mode", "Dark Mode").forEach { themeOption ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         RadioButton(
-                            selected = (selectedTheme == theme),
-                            onClick = { selectedTheme = theme }
+                            selected = (settingsState.selectedTheme == themeOption),
+                            onClick = { settingsViewModel.setTheme(themeOption) }
                         )
                         Text(
-                            text = theme,
+                            text = themeOption,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -104,7 +117,7 @@ fun SettingsScreen() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = selectedLanguage,
+                        value = settingsState.selectedLanguage,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Language") },
@@ -122,7 +135,7 @@ fun SettingsScreen() {
                             DropdownMenuItem(
                                 text = { Text(lang) },
                                 onClick = {
-                                    selectedLanguage = lang
+                                    settingsViewModel.setLanguage(lang)
                                     languageMenuExpanded = false
                                 }
                             )
@@ -132,7 +145,7 @@ fun SettingsScreen() {
             }
         }
 
-        // SECTION 3: About App & API Card
+        // SECTION 3: About App Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
