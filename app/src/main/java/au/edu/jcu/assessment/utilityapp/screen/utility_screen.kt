@@ -59,7 +59,7 @@ fun UtilityScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Title Header
@@ -144,7 +144,7 @@ fun UtilityScreen(
                 }
             }
         } else {
-            // PORTRAIT LAYOUT
+            // PORTRAIT LAYOUT: Perfectly proportioned to fill available screen height
             OutlinedTextField(
                 value = uiState.amountInput,
                 onValueChange = { viewModel.onAmountChanged(it) },
@@ -200,7 +200,7 @@ fun UtilityScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Bottom Space Filler: Live Popular Exchange Rates Grid Card
+            // Expanded Popular Rates Overview to fill remaining vertical screen space
             PopularRatesCard(
                 uiState = uiState,
                 modifier = Modifier.fillMaxWidth()
@@ -224,7 +224,7 @@ fun ResultCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -266,7 +266,7 @@ fun PopularRatesCard(
     uiState: CurrencyUiState,
     modifier: Modifier = Modifier
 ) {
-    val displayCurrencies = listOf("AUD", "EUR", "GBP", "JPY", "CAD", "INR")
+    val displayCurrencies = listOf("USD", "AUD", "EUR", "GBP", "JPY", "CAD", "INR", "NZD", "SGD")
         .filter { it != uiState.fromCurrency }
 
     Card(
@@ -276,11 +276,11 @@ fun PopularRatesCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Live Rates (1 ${uiState.fromCurrency})",
+                text = "Live Exchange Rates (1 ${uiState.fromCurrency})",
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -290,15 +290,16 @@ fun PopularRatesCard(
                 val rate = uiState.rates[target]
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = target,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
                         text = if (rate != null) String.format(Locale.US, "%.4f", rate) else "--",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
