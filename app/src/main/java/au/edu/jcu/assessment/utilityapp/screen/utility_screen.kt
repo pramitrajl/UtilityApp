@@ -3,6 +3,8 @@ package au.edu.jcu.assessment.utilityapp.screen
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +19,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
@@ -37,8 +41,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import au.edu.jcu.assessment.utilityapp.viewmodel.CurrencyUiState
 import au.edu.jcu.assessment.utilityapp.viewmodel.CurrencyViewModel
 import au.edu.jcu.assessment.utilityapp.viewmodel.SettingsViewModel
+import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun UtilityScreen(
     viewModel: CurrencyViewModel = viewModel(),
@@ -47,6 +52,8 @@ fun UtilityScreen(
     val uiState by viewModel.uiState.collectAsState()
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val quickAmounts = listOf("10", "50", "100", "500", "1000")
 
     Column(
         modifier = Modifier
@@ -62,13 +69,12 @@ fun UtilityScreen(
         )
 
         if (isLandscape) {
-            // LANDSCAPE LAYOUT: Side-by-Side (Left: Inputs, Right: Result Card)
+            // LANDSCAPE LAYOUT
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                // Left Column: Amount Input & Dropdowns
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -94,10 +100,7 @@ fun UtilityScreen(
                             modifier = Modifier.weight(1f)
                         )
 
-                        IconButton(
-                            onClick = { viewModel.swapCurrencies() },
-                            modifier = Modifier.padding(horizontal = 2.dp)
-                        ) {
+                        IconButton(onClick = { viewModel.swapCurrencies() }) {
                             Text("⇄", style = MaterialTheme.typography.titleLarge)
                         }
 
@@ -109,17 +112,39 @@ fun UtilityScreen(
                             modifier = Modifier.weight(1f)
                         )
                     }
+
+                    // Quick Amount Chips
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        quickAmounts.forEach { amount ->
+                            FilterChip(
+                                selected = uiState.amountInput == amount,
+                                onClick = { viewModel.onAmountChanged(amount) },
+                                label = { Text("$$amount") }
+                            )
+                        }
+                    }
                 }
 
-                // Right Column: Result Display Card
-                ResultCard(
-                    uiState = uiState,
-                    settingsViewModel = settingsViewModel,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    ResultCard(
+                        uiState = uiState,
+                        settingsViewModel = settingsViewModel,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    PopularRatesCard(
+                        uiState = uiState,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         } else {
-            // PORTRAIT LAYOUT: Stacked Vertically
+            // PORTRAIT LAYOUT
             OutlinedTextField(
                 value = uiState.amountInput,
                 onValueChange = { viewModel.onAmountChanged(it) },
@@ -127,6 +152,20 @@ fun UtilityScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            // Quick Amount Chips
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                quickAmounts.forEach { amount ->
+                    FilterChip(
+                        selected = uiState.amountInput == amount,
+                        onClick = { viewModel.onAmountChanged(amount) },
+                        label = { Text("$$amount") }
+                    )
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -141,10 +180,7 @@ fun UtilityScreen(
                     modifier = Modifier.weight(1f)
                 )
 
-                IconButton(
-                    onClick = { viewModel.swapCurrencies() },
-                    modifier = Modifier.padding(horizontal = 4.dp)
-                ) {
+                IconButton(onClick = { viewModel.swapCurrencies() }) {
                     Text("⇄", style = MaterialTheme.typography.titleLarge)
                 }
 
@@ -157,9 +193,16 @@ fun UtilityScreen(
                 )
             }
 
+            // Main Result Display Card
             ResultCard(
                 uiState = uiState,
                 settingsViewModel = settingsViewModel,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Bottom Space Filler: Live Popular Exchange Rates Grid Card
+            PopularRatesCard(
+                uiState = uiState,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -208,6 +251,55 @@ fun ResultCard(
                         text = uiState.convertedResult,
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Card displaying live exchange rate multipliers for key world currencies.
+ */
+@Composable
+fun PopularRatesCard(
+    uiState: CurrencyUiState,
+    modifier: Modifier = Modifier
+) {
+    val displayCurrencies = listOf("AUD", "EUR", "GBP", "JPY", "CAD", "INR")
+        .filter { it != uiState.fromCurrency }
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = "Live Rates (1 ${uiState.fromCurrency})",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            HorizontalDivider()
+
+            displayCurrencies.forEach { target ->
+                val rate = uiState.rates[target]
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = target,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = if (rate != null) String.format(Locale.US, "%.4f", rate) else "--",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
